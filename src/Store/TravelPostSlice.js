@@ -76,9 +76,14 @@ export const editPostAsync = createAsyncThunk('post/editPostAsync', async ({ id,
 
 export const deletePostAsync = createAsyncThunk('post/deletePostAsync', async (postId) => {
     try {
-        const response = await fetch(`${"API_URL"}/${postId}`, {
+        const accessToken = Cookies.get('accessToken');
+        const response = await fetch(`${"https://localhost:7189/api/TravellerPost/deleteTravellerPost"}/${postId}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            },
             method: 'DELETE',
         });
+
         if (!response.ok) {
             throw new Error('Failed to delete post');
         }

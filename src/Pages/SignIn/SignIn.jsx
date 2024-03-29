@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { signIn, signOut } from "../../Store/AuthSlice"
+import { signIn } from "../../Store/AuthSlice"
 import { useNavigate } from "react-router-dom";
 import "./SignIn.css"
 
@@ -8,10 +8,10 @@ function SignIn() {
     const navigate = useNavigate();
 
 
-    const handleSignOut = () => {
-        dispatch(signOut());
-        navigate("/");
-    };
+    // const handleSignOut = () => {
+    //     dispatch(signOut());
+    //     navigate("/");
+    // };
 
     const dispatch = useDispatch();
 

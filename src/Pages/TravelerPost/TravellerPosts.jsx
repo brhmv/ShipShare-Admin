@@ -9,19 +9,41 @@ import { AiFillEye } from "react-icons/ai";
 import { FaDollarSign } from "react-icons/fa";
 
 import { getAllTravellerPosts } from "../../Store/AdminSlice"
+import { setTravellerStatus } from "../../Store/AdminSlice"
+
+import { deletePostAsync } from "../../Store/TravelPostSlice"
 
 function TravellerPosts() {
     const dispatch = useDispatch();
 
-    const travelerPosts = useSelector(state => state.admin.allTravellerPosts);
+    // const confirmedTravellerPosts = useSelector(state => state.admin.allTravellerPosts.filter(post => post.isConfirmed));
+    const allTravellerPosts = useSelector(state => state.admin.allTravellerPosts);
+
+    const [trigger, setTrigger] = useState(false);
+
+    const handleConfirm = (postId) => {
+        try {
+            debugger;
+            const status = true;
+            const response = dispatch(setTravellerStatus({ postId, status }));
+            setTrigger(prevTrigger => !prevTrigger);
+            console.log(response);
+        } catch (error) {
+            console.error('Error confirming post:', error);
+        }
+    };
 
 
+    const handleDelete = async (postId) => {
+        dispatch(deletePostAsync(postId));
+        setTrigger(prevTrigger => !prevTrigger);
+    };
 
-    const renderTravelerPosts = () => {
+    const renderTravelerPosts = (posts) => {
         return (
             <div className="profile-posts-div">
-                {travelerPosts.length !== 0 ?
-                    travelerPosts.map((post, index) => (
+                {posts.length !== 0 ?
+                    posts.map((post, index) => (
                         <div key={index} className="profile-post-item">
                             <div className="profile-post-details">
                                 <p className="p-detail"><span className="span-detail">Title:</span> <span className='p-span-2'>{post.title}</span></p>
@@ -31,10 +53,32 @@ function TravellerPosts() {
                                 <p className="p-detail"><span className="span-detail">Deadline Date:</span> {formatDate(post.deadlineDate)} <FaCalendarAlt /></p>
                                 <p className="p-detail"><span className="span-detail">Price:</span> {post.price} <FaDollarSign /></p>
                                 <p className="p-detail"><span className="span-detail">Views:</span> {post.views} <AiFillEye /></p>
-                                <div className='d-flex align-content-center justify-content-center'>
-                                    {/* <button className="btn btn-warning m-3 f_size_20" onClick={() => handleUpdate(post, 'traveler')}>Edit</button> */}
-                                    {/* <button className="btn btn-danger m-3 f_size_20" onClick={() => handleDeletePost(post.id, 'traveler')}>Delete</button> */}
-                                </div>
+
+                                <p className="p-detail"><span className="span-detail">Is Confirmed:</span>
+                                    {post.isConfirmed ? <span className="greenColor">
+                                        Confirmed
+                                    </span> : <span className="redColor">
+                                        Not Confirmed
+                                    </span>}
+                                </p>
+
+                                {!post.isConfirmed ?
+                                    <div className='d-flex align-content-center justify-content-center'>
+                                        <button type="button" className="btn btn-success btn-lg mg-5 " onClick={() => handleConfirm(post.id)}>
+                                            Confirm
+                                        </button>
+
+                                        <button className="btn btn-danger btn-lg mg-5" onClick={() => handleDelete(post.id)}>
+                                            Delete
+                                        </button>
+                                    </div>
+                                    :
+                                    <div className='d-flex align-content-center justify-content-center'>
+                                        <button className="btn btn-danger btn-lg" onClick={() => handleDelete(post.id)}>Delete</button>
+                                    </div>
+                                }
+
+
                             </div>
                         </div>
                     )) : <h1 className='profile-h1-tag m-5'>No posts yet.</h1>
@@ -43,7 +87,9 @@ function TravellerPosts() {
         );
     };
 
-
+    useEffect(() => {
+        dispatch(getAllTravellerPosts());
+    }, [dispatch, trigger]);
 
 
     const formatDate = (dateString) => {
@@ -54,21 +100,15 @@ function TravellerPosts() {
         return `${day}/${month}/${year}`;
     };
 
-
-    useEffect(() => {
-        console.log('Sender posts');
-        debugger;
-        dispatch(getAllTravellerPosts());
-        console.log('sender x');
-    }, [dispatch]);
-
     return (
         <div>
             < Navbar />
 
-
             <h1>TravelerPosts</h1>
 
+            <div className="unconfirmed-div">
+                {allTravellerPosts ? renderTravelerPosts(allTravellerPosts) : <h1>No post yet</h1>}
+            </div>
         </div>
     );
 }

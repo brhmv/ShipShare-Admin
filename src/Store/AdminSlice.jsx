@@ -23,8 +23,6 @@ export const getAllTravellerPosts = createAsyncThunk('admin/getAllTravellerPosts
     }
 });
 
-
-
 export const getAllSenderPosts = createAsyncThunk('post/getAllSenderPosts', async () => {
     try {
         const accessToken = Cookies.get('accessToken');
@@ -38,8 +36,6 @@ export const getAllSenderPosts = createAsyncThunk('post/getAllSenderPosts', asyn
         });
 
         const data = await response.json();
-        // console.log("Sender all posts")
-        // console.log(data["$values"]);
         return data["$values"];
 
     } catch (error) {
@@ -61,8 +57,6 @@ export const getAllReviews = createAsyncThunk('post/getAllReviews', async () => 
         });
 
         const data = await response.json();
-        // console.log("Reviews:")
-        // console.log(data["$values"]);
         return data["$values"];
 
     } catch (error) {
@@ -70,6 +64,87 @@ export const getAllReviews = createAsyncThunk('post/getAllReviews', async () => 
         throw error;
     }
 });
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const setSenderStatus = createAsyncThunk('post/setSenderStatus', async ({ postId, status }) => {
+    try {
+        const accessToken = Cookies.get('accessToken');
+        const response = await fetch(`https://localhost:7189/api/Admin/setStatusSenderPost/${postId}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+            method: 'Put',
+            body: JSON.stringify(status),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to edit post!');
+        }
+
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+});
+
+export const setTravellerStatus = createAsyncThunk('post/setTravellerStatus', async ({ postId, status }) => {
+    try {
+        const accessToken = Cookies.get('accessToken');
+        const response = await fetch(`https://localhost:7189/api/Admin/setStatusTravellerPost/${postId}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+            method: 'Put',
+            body: JSON.stringify(status),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to edit post!');
+        }
+
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+});
+
+
+export const setReviewStatus = createAsyncThunk('post/setReviewStatus', async ({ postId, status }) => {
+    try {
+        const accessToken = Cookies.get('accessToken');
+        const response = await fetch(`https://localhost:7189/api/Admin/setStatusReview/${postId}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+            method: 'Put',
+            body: JSON.stringify(status),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to edit post!');
+        }
+
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+});
+
+
 
 
 const adminSlice = createSlice({

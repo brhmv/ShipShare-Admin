@@ -6,10 +6,6 @@
     margin: 0;
 }
 
-.html {
-    font-size: 62.5%;
-}
-
 .navbar input[type="checkbox"],
 .navbar .hamburger-lines {
     display: none;
@@ -41,6 +37,7 @@
 .menu-items {
     order: 2;
     display: flex;
+    margin-top: 10px;
 }
 
 .logo {
@@ -51,7 +48,7 @@
 .menu-items li {
     list-style: none;
     margin-left: 1.5rem;
-    font-size: 1.3rem;
+    font-size: 25px;
 }
 
 .navbar a {

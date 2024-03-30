@@ -105,7 +105,6 @@ function TravellerPosts() {
             postsToSearch = unConfirmedTravellerPosts;
         }
 
-        // Check if postsToSearch is an array before filtering
         if (Array.isArray(postsToSearch)) {
             const filtered = postsToSearch.filter(post =>
                 post.startDestination.toLowerCase().includes(startLocation.toLowerCase()) &&
@@ -113,16 +112,15 @@ function TravellerPosts() {
             );
             setFilteredPosts(filtered);
         } else {
-            // Handle the case when postsToSearch is not an array
             console.error('Posts to search is not an array:', postsToSearch);
-            // You may want to set filteredPosts to an empty array or handle this case differently
             setFilteredPosts([]);
         }
     };
 
     const renderTravelerPosts = () => {
         return (
-            <div className="profile-posts-div">
+            <div>
+
 
                 <div className="search-div">
                     <form className="search-form">
@@ -154,64 +152,77 @@ function TravellerPosts() {
                             data-mdb-ripple-init="true"
                             onClick={handleSearch}
                         >
-                            <i className="fas fa-search"></i>
+                            Search
                         </button>
                     </form>
                 </div>
 
+                <br />
 
-                {filteredPosts.length !== 0 ?
-                    filteredPosts.map((post, index) => (
-                        <div key={index} className="profile-post-item">
-                            <div className="profile-post-details">
-                                <p className="p-detail"><span className="span-detail">Title:</span> <span className='p-span-2'>{post.title}</span></p>
-                                <p className="p-detail"><span className="span-detail">Description:</span> <span className='p-span-2'>{post.description}</span></p>
-                                <p className="p-detail"><span className="span-detail">Start Destination:</span> <span className='p-span-2'>{post.startDestination} <FaLocationDot /></span></p>
-                                <p className="p-detail"><span className="span-detail">End Destination:</span> <span className='p-span-2'>{post.endDestination} <FaLocationDot /></span></p>
-                                <p className="p-detail"><span className="span-detail">Deadline Date:</span> {formatDate(post.deadlineDate)} <FaCalendarAlt /></p>
-                                <p className="p-detail"><span className="span-detail">Price:</span> {post.price} <FaDollarSign /></p>
-                                <p className="p-detail"><span className="span-detail">Views:</span> {post.views} <AiFillEye /></p>
+                <div className="profile-posts-div">
 
-                                <p className="p-detail"><span className="span-detail">Is Confirmed:</span>
-                                    {post.isConfirmed ? <span className="greenColor">
-                                        Confirmed
-                                    </span> : <span className="redColor">
-                                        Not Confirmed
-                                    </span>}
-                                </p>
+                    {filteredPosts.length !== 0 ?
+                        filteredPosts.map((post, index) => (
+                            <div key={index} className="profile-post-item">
+                                <div className="profile-post-details">
+                                    <p className="p-detail"><span className="span-detail">Title:</span> <span className='p-span-2'>{post.title}</span></p>
+                                    <p className="p-detail"><span className="span-detail">Description:</span> <span className='p-span-2'>{post.description}</span></p>
+                                    <p className="p-detail"><span className="span-detail">Start Destination:</span> <span className='p-span-2'>{post.startDestination} <FaLocationDot /></span></p>
+                                    <p className="p-detail"><span className="span-detail">End Destination:</span> <span className='p-span-2'>{post.endDestination} <FaLocationDot /></span></p>
+                                    <p className="p-detail"><span className="span-detail">Deadline Date:</span> {formatDate(post.deadlineDate)} <FaCalendarAlt /></p>
+                                    <p className="p-detail"><span className="span-detail">Price:</span> {post.price} <FaDollarSign /></p>
+                                    <p className="p-detail"><span className="span-detail">Views:</span> {post.views} <AiFillEye /></p>
 
-                                {!post.isConfirmed ?
-                                    <div className='d-flex align-content-center justify-content-center'>
-                                        <button type="button" className="btn btn-success btn-lg mg-5 " onClick={() => handleConfirm(post.id)}>
-                                            Confirm
-                                        </button>
+                                    <p className="p-detail"><span className="span-detail">Is Confirmed:</span>
+                                        {post.isConfirmed ? <span className="greenColor">
+                                            Confirmed
+                                        </span> : <span className="redColor">
+                                            Not Confirmed
+                                        </span>}
+                                    </p>
 
-                                        <button className="btn btn-danger btn-lg mg-5" onClick={() => handleDelete(post.id)}>
-                                            Delete
-                                        </button>
-                                    </div>
-                                    :
-                                    <div className='d-flex align-content-center justify-content-center'>
-                                        <button className="btn btn-danger btn-lg" onClick={() => handleDelete(post.id)}>Delete</button>
-                                    </div>
-                                }
+                                    {!post.isConfirmed ?
+                                        <div className='d-flex align-content-center justify-content-center'>
+                                            <button type="button" className="btn btn-success btn-lg mg-5 " onClick={() => handleConfirm(post.id)}>
+                                                Confirm
+                                            </button>
+
+                                            <button className="btn btn-danger btn-lg mg-5" onClick={() => handleDelete(post.id)}>
+                                                Delete
+                                            </button>
+                                        </div>
+                                        :
+                                        <div className='d-flex align-content-center justify-content-center'>
+                                            <button className="btn btn-danger btn-lg" onClick={() => handleDelete(post.id)}>Delete</button>
+                                        </div>
+                                    }
 
 
+                                </div>
                             </div>
-                        </div>
-                    )) : <h1 className='mg-5 npy'>No Post Yet!</h1>
-                }
+                        )) : <h1 className='mg-5 npy'>No Post Yet!</h1>
+                    }
+                </div>
             </div>
+
         );
     };
 
     useEffect(() => {
         dispatch(getAllTravellerPosts());
+
         setConfirmedTravellerPosts([...travellerPosts.filter(p => p.isConfirmed)]);
         setunConfirmedTravellerPosts([...travellerPosts.filter(p => !p.isConfirmed)]);
         setFilteredPosts(confirmedTravellerPosts)
     }, [dispatch, trigger,travellerPosts]);
 
+    useEffect(() => {
+        if (postType === 'confirmed') {
+            setFilteredPosts(confirmedTravellerPosts);
+        } else if (postType === 'unconfirmed') {
+            setFilteredPosts(unConfirmedTravellerPosts);
+        }
+    }, [postType, confirmedTravellerPosts, unConfirmedTravellerPosts]);
 
     const formatDate = (dateString) => {
         const dateTime = new Date(dateString);
@@ -232,9 +243,6 @@ function TravellerPosts() {
             setFilteredPosts(unConfirmedTravellerPosts);
         }
     };
-
-
-
 
     return (
         <div>
@@ -274,8 +282,8 @@ function TravellerPosts() {
 
 
             {/* {(postType === 'confirmed' && confirmedTravellerPosts) && renderTravelerPosts(confirmedTravellerPosts)}
-            {(postType === 'unconfirmed' && unConfirmedTravellerPosts) && renderTravelerPosts(unConfirmedTravellerPosts)}
- */}
+            {(postType === 'unconfirmed' && unConfirmedTravellerPosts) && renderTravelerPosts(unConfirmedTravellerPosts)} */}
+
 
             {renderTravelerPosts()};
 

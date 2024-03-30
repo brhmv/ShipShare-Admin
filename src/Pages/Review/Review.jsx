@@ -10,20 +10,25 @@ import { deleteReview } from "../../Store/ReviewSlice"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-function Review() {
+const Review = () => {
     const dispatch = useDispatch();
-    const [trigger, setTrigger] = useState(false);
 
-    const unConfirmedReviews = useSelector(state => state.admin.allReviews.filter(post => !post.isConfirmed));
-    const confirmedReviews = useSelector(state => state.admin.allReviews.filter(post => post.isConfirmed));
+    const reviews = useSelector(state => state.admin.allReviews);
+
+    const [confirmedReviews,setConfirmedReviews] = useState([]);
+    const [unconfirmedReviews,setUnconfirmedReviews] = useState([]);
 
     const [postType, setPostType] = useState('confirmed');
 
     const reviewInfo = useSelector((state) => state.review);
 
+    const [trigger,setTrigger] = useState(false);
+
     useEffect(() => {
         dispatch(getAllReviews());
-    }, [dispatch, trigger]);
+        setConfirmedReviews([...reviews.filter(r => r.isConfirmed)]);
+        setUnconfirmedReviews([...reviews.filter(r => !r.isConfirmed)]);
+    }, [dispatch, trigger,reviews]);
 
     const renderStars = (numStars) => {
         const stars = [];
@@ -66,22 +71,17 @@ function Review() {
                     theme: "dark"
                 });
                 // ActivateTrigger();
-                setTrigger(true);
+                setTrigger(!trigger);
+                console.log(trigger);
             }
         } catch (error) {
             console.error('Error confirming Review:', error);
         }
     };
 
-    const ActivateTrigger = useCallback(() => {
-        setTrigger(prevTrigger => !prevTrigger);
-    }, []);
-
     const handleDelete = (reviewId) => {
 
         const response = dispatch(deleteReview(reviewId));
-
-        ActivateTrigger();
 
         const error = reviewInfo.error ?? true
 
@@ -96,7 +96,11 @@ function Review() {
                 progress: undefined,
                 theme: "dark"
             });
-
+            console.log(trigger);
+            setTrigger(!trigger);
+            console.log("after")
+            console.log(trigger);
+            
         }
         else {
             toast.error('Failed to delete review!', {
@@ -109,7 +113,7 @@ function Review() {
                 progress: undefined,
                 theme: "dark"
             });
-            setTrigger(true);
+            setTrigger(!trigger);
             // ActivateTrigger();
         }
 
@@ -203,7 +207,7 @@ function Review() {
             <br />
 
             {(postType === 'confirmed' && confirmedReviews) && renderReview(confirmedReviews)}
-            {(postType === 'unconfirmed' && unConfirmedReviews) && renderReview(unConfirmedReviews)}
+            {(postType === 'unconfirmed' && unconfirmedReviews) && renderReview(unconfirmedReviews)}
 
         </div >
     );

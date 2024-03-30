@@ -29,6 +29,10 @@ function SenderPosts() {
     const dispatch = useDispatch();
 
 
+    const [filteredPosts, setFilteredPosts] = useState("");
+    const [startLocation, setStartLocation] = useState('');
+    const [endLocation, setEndLocation] = useState('');
+
 
     const handleConfirm = (postId) => {
         try {
@@ -115,66 +119,143 @@ function SenderPosts() {
 
     const handlePostTypeChange = (type) => {
         setPostType(type);
+
+        if (type === 'confirmed') {
+            setFilteredPosts(confirmedSenderPosts)
+        }
+
+        else if (type === 'unconfirmed') {
+            setFilteredPosts(unConfirmedSenderPosts);
+        }
     };
 
     const renderSenderPosts = (Posts) => {
         return (
-            <div className="profile-posts-div">
-                {Posts.length !== 0 ?
-                    Posts.map((post, index) => (
-                        <div key={index} className="profile-post-item">
-                            <div className="post-image">
-                                <img src={post.itemPhotos ? post.itemPhotos["$values"][0] : "null"} alt={post.id} />
-                            </div>
-
-                            <div className="profile-post-details">
-                                <p className="p-detail"><span className="span-detail">Title:</span> <span className='p-span-2'>{post.title}</span></p>
-                                <p className="p-detail"><span className="span-detail">Description:</span> <span className='p-span-2'>{post.description}</span> </p>
-                                <p className="p-detail"><span className="span-detail">Start Destination:</span> <span className='p-span-2'>{post.startDestination} <FaLocationDot /></span></p>
-                                <p className="p-detail"><span className="span-detail">End Destination:</span> <span className='p-span-2'>{post.endDestination} <FaLocationDot /></span></p>
-                                <p className="p-detail"><span className="span-detail">Deadline Date:</span> {formatDate(post.deadlineDate)} <FaCalendarAlt /></p>
-                                <p className="p-detail"><span className="span-detail">Item Category: </span>{post.itemType}</p>
-                                <p className="p-detail"><span className="span-detail">Price:</span> {post.price} <FaDollarSign /></p>
-                                <p className="p-detail"><span className="span-detail">Weight:</span> {post.itemWeight} <GiWeight /></p>
-                                <p className="p-detail"><span className="span-detail">Views:</span> {post.views} <AiFillEye /></p>
-
-                                <p className="p-detail"><span className="span-detail">Is Confirmed:</span>
-                                    {post.isConfirmed ? <span className="greenColor">
-                                        Confirmed
-                                    </span> : <span className="redColor">
-                                        Not Confirmed
-                                    </span>}
-                                </p>
-
-
-                                {!post.isConfirmed ?
-                                    <div className='d-flex align-content-center justify-content-center'>
-                                        <button type="button" className="btn btn-success btn-lg mg-5 " onClick={() => handleConfirm(post.id)}>
-                                            Confirm
-                                        </button>
-
-                                        <button className="btn btn-danger btn-lg mg-5" onClick={() => handleDelete(post.id)}>
-                                            Delete
-                                        </button>
-                                    </div>
-                                    :
-                                    <div className='d-flex align-content-center justify-content-center'>
-                                        <button className="btn btn-danger btn-lg" onClick={() => handleDelete(post.id)}>Delete</button>
-                                    </div>
-                                }
-
-                            </div>
+            <div>
+                <div className="search-div">
+                    <form className="search-form">
+                        <div className="form-outline" data-mdb-input-init>
+                            <input
+                                id="search-focus"
+                                placeholder='Start Location'
+                                value={startLocation}
+                                onChange={e => setStartLocation(e.target.value)}
+                                type="search"
+                                className="form-control"
+                            />
                         </div>
-                    ))
-                    : <h1 className='mg-5 npy'>No Post Yet!</h1>
-                }
-            </div >
+
+                        <div className="form-outline" data-mdb-input-init>
+                            <input
+                                id="search-focus-form1"
+                                type="search"
+                                value={endLocation}
+                                onChange={e => setEndLocation(e.target.value)}
+                                placeholder='End Location'
+                                className="form-control"
+                            />
+                        </div>
+
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            data-mdb-ripple-init="true"
+                            onClick={handleSearch}
+                        >
+                            Search
+                        </button>
+                    </form>
+                </div>
+
+                <div className="profile-posts-div">
+                    {filteredPosts.length !== 0 ?
+                        filteredPosts.map((post, index) => (
+                            <div key={index} className="profile-post-item">
+                                <div className="post-image">
+                                    <img src={post.itemPhotos ? post.itemPhotos["$values"][0] : "null"} alt={post.id} />
+                                </div>
+
+                                <div className="profile-post-details">
+                                    <p className="p-detail"><span className="span-detail">Title:</span> <span className='p-span-2'>{post.title}</span></p>
+                                    <p className="p-detail"><span className="span-detail">Description:</span> <span className='p-span-2'>{post.description}</span> </p>
+                                    <p className="p-detail"><span className="span-detail">Start Destination:</span> <span className='p-span-2'>{post.startDestination} <FaLocationDot /></span></p>
+                                    <p className="p-detail"><span className="span-detail">End Destination:</span> <span className='p-span-2'>{post.endDestination} <FaLocationDot /></span></p>
+                                    <p className="p-detail"><span className="span-detail">Deadline Date:</span> {formatDate(post.deadlineDate)} <FaCalendarAlt /></p>
+                                    <p className="p-detail"><span className="span-detail">Item Category: </span>{post.itemType}</p>
+                                    <p className="p-detail"><span className="span-detail">Price:</span> {post.price} <FaDollarSign /></p>
+                                    <p className="p-detail"><span className="span-detail">Weight:</span> {post.itemWeight} <GiWeight /></p>
+                                    <p className="p-detail"><span className="span-detail">Views:</span> {post.views} <AiFillEye /></p>
+
+                                    <p className="p-detail"><span className="span-detail">Is Confirmed:</span>
+                                        {post.isConfirmed ? <span className="greenColor">
+                                            Confirmed
+                                        </span> : <span className="redColor">
+                                            Not Confirmed
+                                        </span>}
+                                    </p>
+
+
+                                    {!post.isConfirmed ?
+                                        <div className='d-flex align-content-center justify-content-center'>
+                                            <button type="button" className="btn btn-success btn-lg mg-5 " onClick={() => handleConfirm(post.id)}>
+                                                Confirm
+                                            </button>
+
+                                            <button className="btn btn-danger btn-lg mg-5" onClick={() => handleDelete(post.id)}>
+                                                Delete
+                                            </button>
+                                        </div>
+                                        :
+                                        <div className='d-flex align-content-center justify-content-center'>
+                                            <button className="btn btn-danger btn-lg" onClick={() => handleDelete(post.id)}>Delete</button>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+                        ))
+                        : <h1 className='mg-5 npy'>No Post Yet!</h1>
+                    }
+                </div >
+            </div>
+
         );
     };
 
     useEffect(() => {
         dispatch(getAllSenderPosts());
     }, [dispatch, trigger]);
+
+    const handleSearch = () => {
+
+        let postsToSearch = [];
+        if (postType === 'confirmed') {
+            postsToSearch = confirmedSenderPosts;
+        } else if (postType === 'unconfirmed') {
+            postsToSearch = unConfirmedSenderPosts;
+        }
+
+        if (Array.isArray(postsToSearch)) {
+            const filtered = postsToSearch.filter(post =>
+                post.startDestination.toLowerCase().includes(startLocation.toLowerCase()) &&
+                post.endDestination.toLowerCase().includes(endLocation.toLowerCase())
+            );
+            setFilteredPosts(filtered);
+        } else {
+            console.error('Posts to search is not an array:', postsToSearch);
+            setFilteredPosts([]);
+        }
+    };
+
+    useEffect(() => {
+        if (postType === 'confirmed') {
+            setFilteredPosts(confirmedSenderPosts);
+        } else if (postType === 'unconfirmed') {
+            setFilteredPosts(unConfirmedSenderPosts);
+        }
+    }, [postType, confirmedSenderPosts, unConfirmedSenderPosts]);
+
+
 
     return (
         <div>
@@ -212,12 +293,12 @@ function SenderPosts() {
 
             <br />
 
-
+            {/* 
             {(postType === 'confirmed' && confirmedSenderPosts) && renderSenderPosts(confirmedSenderPosts)}
             {(postType === 'unconfirmed' && unConfirmedSenderPosts) && renderSenderPosts(unConfirmedSenderPosts)}
+ */}
 
-
-
+            {renderSenderPosts()};
         </div>
     );
 }

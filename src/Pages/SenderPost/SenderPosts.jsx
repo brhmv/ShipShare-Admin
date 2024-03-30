@@ -17,9 +17,9 @@ import { deletePostAsync } from "../../Store/SenderPostSlice"
 
 
 function SenderPosts() {
-    const confirmedSenderPosts = useSelector(state => state.admin.allSenderPosts.filter(post => post.isConfirmed)) ?? <h1>No Post Yet!</h1>;
-    const unConfirmedSenderPosts = useSelector(state => state.admin.allSenderPosts.filter(post => !post.isConfirmed)) ?? <h1>No Post Yet!</h1>;
-
+    const senderPosts = useSelector(state => state.admin.allSenderPosts);
+    const [confirmedSenderPosts,setConfirmedSenderPosts] = useState([]);
+    const [unConfirmedSenderPosts,setunConfirmedSenderPosts] = useState([]);
     const [postType, setPostType] = useState('confirmed');
 
     const senderPostInfo = useSelector((state) => state.senderPost);
@@ -27,8 +27,6 @@ function SenderPosts() {
     const [trigger, setTrigger] = useState(false);
 
     const dispatch = useDispatch();
-
-
 
     const handleConfirm = (postId) => {
         try {
@@ -47,6 +45,7 @@ function SenderPosts() {
                     progress: undefined,
                     theme: "dark"
                 });
+                setTrigger(!trigger);
             } else {
                 toast.success('Traveler Post Confirmed Successfully!', {
                     position: "top-right",
@@ -58,7 +57,7 @@ function SenderPosts() {
                     progress: undefined,
                     theme: "dark"
                 });
-                ActivateTrigger();
+                setTrigger(!trigger);
             }
         }
         catch (error) {
@@ -66,14 +65,8 @@ function SenderPosts() {
         }
     };
 
-    const ActivateTrigger = useCallback(() => {
-        setTrigger(prevTrigger => !prevTrigger);
-    }, []);
-
     const handleDelete = async (postId) => {
         const response = dispatch(deletePostAsync(postId));
-
-        ActivateTrigger();
 
         const error = senderPostInfo.error ?? true
 
@@ -88,8 +81,7 @@ function SenderPosts() {
                 progress: undefined,
                 theme: "dark"
             });
-
-            // ActivateTrigger();
+            setTrigger(!trigger);
         }
         else {
             toast.error('Failed to delete Sender Post!', {
@@ -102,6 +94,7 @@ function SenderPosts() {
                 progress: undefined,
                 theme: "dark"
             });
+            setTrigger(!trigger);
         }
     };
 
@@ -174,7 +167,9 @@ function SenderPosts() {
 
     useEffect(() => {
         dispatch(getAllSenderPosts());
-    }, [dispatch, trigger]);
+        setConfirmedSenderPosts([...senderPosts.filter(p => p.isConfirmed)]);
+        setunConfirmedSenderPosts([...senderPosts.filter(p => !p.isConfirmed)]);
+    }, [dispatch, trigger,senderPosts]);
 
     return (
         <div>

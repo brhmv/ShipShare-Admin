@@ -16,30 +16,21 @@ function TravellerPosts() {
     const dispatch = useDispatch();
     const [postType, setPostType] = useState('confirmed');
 
-    const confirmedTravellerPosts = useSelector(state => state.admin.allTravellerPosts.filter(post => post.isConfirmed));
-    const unConfirmedTravellerPosts = useSelector(state => state.admin.allTravellerPosts.filter(post => !post.isConfirmed));
+    const travellerPosts = useSelector(state => state.admin.allTravellerPosts)
+    const [confirmedTravellerPosts,setConfirmedTravellerPosts]= useState([]);
+    const [unConfirmedTravellerPosts,setunConfirmedTravellerPosts] = useState([]);
 
     const travelPostInfo = useSelector((state) => state.travelPost);
-
-
     const [trigger, setTrigger] = useState(false);
-
 
     const [filteredPosts, setFilteredPosts] = useState("");
     const [startLocation, setStartLocation] = useState('');
     const [endLocation, setEndLocation] = useState('');
 
-
-    const ActivateTrigger = useCallback(() => {
-        setTrigger(prevTrigger => !prevTrigger);
-    }, []);
-
     const handleConfirm = (postId) => {
         try {
             const status = true;
             const response = dispatch(setTravellerStatus({ postId, status }));
-            ActivateTrigger();
-
             if (response.error) {
                 toast.error('Failed to Confirm Traveler Post!', {
                     position: "top-right",
@@ -51,6 +42,7 @@ function TravellerPosts() {
                     progress: undefined,
                     theme: "dark"
                 });
+                setTrigger(!trigger);
             } else {
                 toast.success('Traveler Post Confirmed Successfully!', {
                     position: "top-right",
@@ -62,7 +54,7 @@ function TravellerPosts() {
                     progress: undefined,
                     theme: "dark"
                 });
-                ActivateTrigger();
+                setTrigger(!trigger);
             }
         } catch (error) {
             console.error('Error confirming post:', error);
@@ -86,8 +78,7 @@ function TravellerPosts() {
                 progress: undefined,
                 theme: "dark"
             });
-
-            ActivateTrigger();
+            setTrigger(!trigger);
         }
         else {
             toast.error('Failed to delete Traveler Post!', {
@@ -100,6 +91,7 @@ function TravellerPosts() {
                 progress: undefined,
                 theme: "dark"
             });
+            setTrigger(!trigger);
         }
 
     };
@@ -127,8 +119,6 @@ function TravellerPosts() {
             setFilteredPosts([]);
         }
     };
-
-
 
     const renderTravelerPosts = () => {
         return (
@@ -217,9 +207,10 @@ function TravellerPosts() {
 
     useEffect(() => {
         dispatch(getAllTravellerPosts());
-
+        setConfirmedTravellerPosts([...travellerPosts.filter(p => p.isConfirmed)]);
+        setunConfirmedTravellerPosts([...travellerPosts.filter(p => !p.isConfirmed)]);
         setFilteredPosts(confirmedTravellerPosts)
-    }, [dispatch, trigger]);
+    }, [dispatch, trigger,travellerPosts]);
 
 
     const formatDate = (dateString) => {

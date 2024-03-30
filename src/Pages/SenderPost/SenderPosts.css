@@ -121,17 +121,6 @@
 }
 
 
-.confirmed-div {
-    background-color: #afa708;
-    padding: 0%;
-    border-radius: 25px;
-}
-
-.unconfirmed-div {
-    background-color: rgb(242, 178, 16);
-    padding: 0%;
-    border-radius: 25px;
-}
 
 .redColor {
     font-weight: 600;
@@ -140,9 +129,29 @@
 
 .greenColor {
     font-weight: 600;
-    color: rgb(5, 235, 5);
+    color: rgb(5, 235, 5) !important;
 }
 
 .mg-5 {
     margin: 5px;
+}
+
+.mg-15 {
+    margin: 15px;
+}
+
+.npy {
+    color: #f2f2f2;
+    font-weight: 700;
+}
+
+
+/* ////////////////////////////////////////// */
+
+
+.search-form {
+    display: flex;
+    flex-flow: row;
+    margin: auto;
+    gap: 20px;
 }

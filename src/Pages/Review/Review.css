@@ -1,16 +1,30 @@
+.reviews {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+
+
+
+
+
+
 .review-item {
     display: flex;
     flex-flow: column;
-    border: 1px solid white !important;
+    /* border: 1px solid white !important; */
     margin: 0px 50px;
     height: fit-content;
     padding: 10px;
     text-align: center;
-    background-color: #958cf2;
+    /* background-color: #958cf2; */
+    background-color: #6d61f3;
     border-radius: 25px;
-    margin: auto;
-    margin: 5px 10px;
+    /* margin: auto; */
+    margin: 15px 15px;
     transition: box-shadow 0.3s ease;
+
+    width: 475px;
 }
 
 .review-item:hover {
@@ -21,7 +35,7 @@
 .review-item-1 {
     display: flex;
     height: fit-content;
-    padding: 20px;
+    padding: 25px;
     flex-wrap: wrap;
     justify-content: space-between;
 }

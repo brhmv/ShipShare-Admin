@@ -64,8 +64,8 @@ export const deleteReview = createAsyncThunk('review/deleteReview', async (revie
         if (!response.ok) {
             throw new Error('Failed to delete review');
         }
-        console.log(reviewId)
-        return reviewId;
+
+        return response.ok;
     } catch (error) {
         throw error;
     }
@@ -73,7 +73,11 @@ export const deleteReview = createAsyncThunk('review/deleteReview', async (revie
 
 const reviewSlice = createSlice({
     name: 'review',
-    initialState,
+    initialState: {
+        reviews: [],
+        status: 'idle',
+        error: null,
+    },
     reducers: {
         addReview: (state, action) => {
             state.reviews.push(action.payload);
@@ -100,6 +104,10 @@ const reviewSlice = createSlice({
             })
             .addCase(deleteReview.fulfilled, (state, action) => {
                 state.reviews = state.reviews.filter(review => review.id !== action.payload);
+            })
+            .addCase(deleteReview.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
             });
     },
 });

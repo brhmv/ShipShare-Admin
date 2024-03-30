@@ -1,33 +1,69 @@
 import Navbar from "../../Components/Navbar";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-
 import { FaLocationDot } from "react-icons/fa6";
 import { FaCalendarAlt } from "react-icons/fa";
 import { AiFillEye } from "react-icons/ai";
 // import { GiWeight } from "react-icons/gi";
 import { FaDollarSign } from "react-icons/fa";
-
+import { deletePostAsync } from "../../Store/TravelPostSlice"
 import { getAllTravellerPosts } from "../../Store/AdminSlice"
 import { setTravellerStatus } from "../../Store/AdminSlice"
-
-import { deletePostAsync } from "../../Store/TravelPostSlice"
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function TravellerPosts() {
     const dispatch = useDispatch();
+    const [postType, setPostType] = useState('confirmed');
 
-    // const confirmedTravellerPosts = useSelector(state => state.admin.allTravellerPosts.filter(post => post.isConfirmed));
-    const allTravellerPosts = useSelector(state => state.admin.allTravellerPosts);
+    const confirmedTravellerPosts = useSelector(state => state.admin.allTravellerPosts.filter(post => post.isConfirmed));
+    const unConfirmedTravellerPosts = useSelector(state => state.admin.allTravellerPosts.filter(post => !post.isConfirmed));
+
+    const travelPostInfo = useSelector((state) => state.travelPost);
+
 
     const [trigger, setTrigger] = useState(false);
 
+
+    const [filteredPosts, setFilteredPosts] = useState("");
+    const [startLocation, setStartLocation] = useState('');
+    const [endLocation, setEndLocation] = useState('');
+
+
+    const ActivateTrigger = useCallback(() => {
+        setTrigger(prevTrigger => !prevTrigger);
+    }, []);
+
     const handleConfirm = (postId) => {
         try {
-            debugger;
             const status = true;
             const response = dispatch(setTravellerStatus({ postId, status }));
-            setTrigger(prevTrigger => !prevTrigger);
-            console.log(response);
+            ActivateTrigger();
+
+            if (response.error) {
+                toast.error('Failed to Confirm Traveler Post!', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark"
+                });
+            } else {
+                toast.success('Traveler Post Confirmed Successfully!', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark"
+                });
+                ActivateTrigger();
+            }
         } catch (error) {
             console.error('Error confirming post:', error);
         }
@@ -36,14 +72,106 @@ function TravellerPosts() {
 
     const handleDelete = async (postId) => {
         dispatch(deletePostAsync(postId));
-        setTrigger(prevTrigger => !prevTrigger);
+
+        const error = travelPostInfo.error ?? true
+
+        if (error) {
+            toast.success('Traveler Post deleted Succesfully!', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark"
+            });
+
+            ActivateTrigger();
+        }
+        else {
+            toast.error('Failed to delete Traveler Post!', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark"
+            });
+        }
+
     };
 
-    const renderTravelerPosts = (posts) => {
+    const handleSearch = () => {
+
+        let postsToSearch = [];
+        if (postType === 'confirmed') {
+            postsToSearch = confirmedTravellerPosts;
+        } else if (postType === 'unconfirmed') {
+            postsToSearch = unConfirmedTravellerPosts;
+        }
+
+        // Check if postsToSearch is an array before filtering
+        if (Array.isArray(postsToSearch)) {
+            const filtered = postsToSearch.filter(post =>
+                post.startDestination.toLowerCase().includes(startLocation.toLowerCase()) &&
+                post.endDestination.toLowerCase().includes(endLocation.toLowerCase())
+            );
+            setFilteredPosts(filtered);
+        } else {
+            // Handle the case when postsToSearch is not an array
+            console.error('Posts to search is not an array:', postsToSearch);
+            // You may want to set filteredPosts to an empty array or handle this case differently
+            setFilteredPosts([]);
+        }
+    };
+
+
+
+    const renderTravelerPosts = () => {
         return (
             <div className="profile-posts-div">
-                {posts.length !== 0 ?
-                    posts.map((post, index) => (
+
+                <div className="search-div">
+                    <form className="search-form">
+                        <div className="form-outline" data-mdb-input-init>
+                            <input
+                                id="search-focus"
+                                placeholder='Start Location'
+                                value={startLocation}
+                                onChange={e => setStartLocation(e.target.value)}
+                                type="search"
+                                className="form-control"
+                            />
+                        </div>
+
+                        <div className="form-outline" data-mdb-input-init>
+                            <input
+                                id="search-focus-form1"
+                                type="search"
+                                value={endLocation}
+                                onChange={e => setEndLocation(e.target.value)}
+                                placeholder='End Location'
+                                className="form-control"
+                            />
+                        </div>
+
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            data-mdb-ripple-init="true"
+                            onClick={handleSearch}
+                        >
+                            <i className="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+
+
+                {filteredPosts.length !== 0 ?
+                    filteredPosts.map((post, index) => (
                         <div key={index} className="profile-post-item">
                             <div className="profile-post-details">
                                 <p className="p-detail"><span className="span-detail">Title:</span> <span className='p-span-2'>{post.title}</span></p>
@@ -81,7 +209,7 @@ function TravellerPosts() {
 
                             </div>
                         </div>
-                    )) : <h1 className='profile-h1-tag m-5'>No posts yet.</h1>
+                    )) : <h1 className='mg-5 npy'>No Post Yet!</h1>
                 }
             </div>
         );
@@ -89,6 +217,8 @@ function TravellerPosts() {
 
     useEffect(() => {
         dispatch(getAllTravellerPosts());
+
+        setFilteredPosts(confirmedTravellerPosts)
     }, [dispatch, trigger]);
 
 
@@ -100,15 +230,64 @@ function TravellerPosts() {
         return `${day}/${month}/${year}`;
     };
 
+    const handlePostTypeChange = (type) => {
+        setPostType(type);
+
+        if (type === 'confirmed') {
+            setFilteredPosts(confirmedTravellerPosts)
+        }
+
+        else if (type === 'unconfirmed') {
+            setFilteredPosts(unConfirmedTravellerPosts);
+        }
+    };
+
+
+
+
     return (
         <div>
             < Navbar />
 
-            <h1>TravelerPosts</h1>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+            />
 
-            <div className="unconfirmed-div">
-                {allTravellerPosts ? renderTravelerPosts(allTravellerPosts) : <h1>No post yet</h1>}
+            <div className="profile-button-div">
+                <button
+                    className={`btn ${postType === 'confirmed' ? 'btn-success' : 'btn-secondary'}`}
+                    onClick={() => handlePostTypeChange('confirmed')}
+                >
+                    Confirmed Traveler Posts
+                </button>
+
+                <button
+                    className={`btn ${postType === 'unconfirmed' ? 'btn-danger' : 'btn-secondary'}`}
+                    onClick={() => handlePostTypeChange('unconfirmed')}
+                >
+                    UnConfirmed Traveler Posts
+                </button>
             </div>
+
+            <br />
+
+
+
+            {/* {(postType === 'confirmed' && confirmedTravellerPosts) && renderTravelerPosts(confirmedTravellerPosts)}
+            {(postType === 'unconfirmed' && unConfirmedTravellerPosts) && renderTravelerPosts(unConfirmedTravellerPosts)}
+ */}
+
+            {renderTravelerPosts()};
+
         </div>
     );
 }

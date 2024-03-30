@@ -1,7 +1,17 @@
-import { Link } from "react-router-dom";
 import "./Navbar.css";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { signOut } from "../Store/AuthSlice"
 
 function Navbar() {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const handleSignOut = () => {
+        dispatch(signOut());
+        navigate("/signIn");
+    };
+
     return (
         <div>
             <nav class="navbar">
@@ -16,13 +26,14 @@ function Navbar() {
                         <li><Link to="../SenderPosts">Sender Posts</Link></li>
                         <li><Link to="../TravelerPosts">Traveler Posts</Link></li>
                         <li><Link to="../Reviews">All Reviews</Link></li>
+                        <li><Link to="../signIn" onClick={handleSignOut}>Sign Out</Link></li>
                     </ul>
                     <h1 class="logo">Admin</h1>
                 </div>
             </nav>
 
 
-            {[...Array(4)].map((_, index) => (
+            {[...Array(2)].map((_, index) => (
                 <br key={index}></br>
             ))}
         </div>

@@ -110,7 +110,6 @@ export const setTravellerStatus = createAsyncThunk('post/setTravellerStatus', as
         }
 
         const data = await response.json();
-        console.log(data);
         return data;
     } catch (error) {
         console.log(error);
@@ -119,10 +118,10 @@ export const setTravellerStatus = createAsyncThunk('post/setTravellerStatus', as
 });
 
 
-export const setReviewStatus = createAsyncThunk('post/setReviewStatus', async ({ postId, status }) => {
+export const setReviewStatus = createAsyncThunk('post/setReviewStatus', async ({ reviewId, status }) => {
     try {
         const accessToken = Cookies.get('accessToken');
-        const response = await fetch(`https://localhost:7189/api/Admin/setStatusReview/${postId}`, {
+        const response = await fetch(`https://localhost:7189/api/Admin/setStatusReview/${reviewId}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
@@ -185,6 +184,21 @@ const adminSlice = createSlice({
                 state.status = 'idle';
                 state.error = action.error.message;
             })
+        ////////////////////////////////////////////////////////////////////
+        // .addCase(deleteReview.fulfilled, (state, action) => {
+        //     state.allReviews = state.allReviews.filter(review => review.id !== action.payload.reviewId);
+        // })
+
+        // .addCase(setReviewStatus.fulfilled, (state, action) => {
+        //     // Update the review status in the state
+        //     const updatedReviews = state.allReviews.map(review => {
+        //         if (review.id === action.payload.reviewId) {
+        //             return { ...review, isConfirmed: true }; // Assuming your review object has an id and isConfirmed property
+        //         }
+        //         return review;
+        //     });
+        //     state.allReviews = updatedReviews;
+        // })
     },
 });
 

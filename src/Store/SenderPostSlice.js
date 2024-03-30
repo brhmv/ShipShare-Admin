@@ -83,17 +83,20 @@ export const deletePostAsync = createAsyncThunk('post/deletePostAsync', async (p
             },
             method: 'DELETE',
         });
+
         if (!response.ok) {
             throw new Error('Failed to delete post');
         }
-        return postId;
+
+        return response.ok;
+
     } catch (error) {
         throw error;
     }
 });
 
 const postSlice = createSlice({
-    name: 'travelPost',
+    name: 'senderPost',
     initialState: {
         posts: [],
         status: 'idle',
@@ -151,6 +154,11 @@ const postSlice = createSlice({
             })
             .addCase(deletePostAsync.fulfilled, (state, action) => {
                 state.posts = state.posts.filter(post => post.id !== action.payload);
+            })
+
+            .addCase(deletePostAsync.rejected, (state, action) => {
+                state.status = 'idle';
+                state.error = action.error.message;
             });
     },
 });

@@ -87,7 +87,9 @@ export const deletePostAsync = createAsyncThunk('post/deletePostAsync', async (p
         if (!response.ok) {
             throw new Error('Failed to delete post');
         }
-        return postId;
+
+        return response.ok;
+
     } catch (error) {
         throw error;
     }
@@ -150,8 +152,15 @@ const postSlice = createSlice({
                     state.posts[index] = { ...state.posts[index], ...newData };
                 }
             })
+
             .addCase(deletePostAsync.fulfilled, (state, action) => {
                 state.posts = state.posts.filter(post => post.id !== action.payload);
+            })
+
+            .addCase(deletePostAsync.rejected, (state, action) => {
+                debugger;
+                state.status = 'idle';
+                state.error = action.error.message;
             });
     },
 });
